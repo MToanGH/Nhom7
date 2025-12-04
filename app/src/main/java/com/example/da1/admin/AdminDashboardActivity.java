@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -20,6 +21,8 @@ import com.example.da1.admin.order.OrderManagementActivity;
 import com.example.da1.admin.product.ProductManagementActivity;
 import com.example.da1.admin.user.UserManagementActivity;
 import com.example.da1.admin.voucher.VoucherManagementActivity;
+import com.example.da1.auth.LoginActivity;
+import com.example.da1.utils.SharedPreferencesHelper;
 import com.google.android.material.navigation.NavigationView;
 
 public class AdminDashboardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -91,26 +94,38 @@ public class AdminDashboardActivity extends AppCompatActivity implements Navigat
             navigateToActivity(CategoryManagementActivity.class);
         } else if (itemId == R.id.nav_manage_orders) {
             navigateToActivity(OrderManagementActivity.class);
-        } else if (itemId == R.id.nav_page_one) {
-            showToast("Page One");
-        } else if (itemId == R.id.nav_page_two) {
-            showToast("Page Two");
-        } else if (itemId == R.id.nav_page_three) {
-            showToast("Page Three");
-        } else if (itemId == R.id.nav_page_four) {
-            showToast("Page Four");
-        } else if (itemId == R.id.nav_page_five) {
-            showToast("Page Five");
-        } else if (itemId == R.id.nav_page_six) {
-            showToast("Page Six");
-        } else if (itemId == R.id.nav_page_seven) {
-            showToast("Page Seven");
-        } else if (itemId == R.id.nav_page_eight) {
-            showToast("Page Eight");
+        } else if (itemId == R.id.nav_statistics) {
+            showToast("Xem thống kê");
+            // TODO: Navigate to statistics activity
+        } else if (itemId == R.id.nav_logout) {
+            showLogoutDialog();
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showLogoutDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Đăng xuất")
+                .setMessage("Bạn có chắc chắn muốn đăng xuất?")
+                .setPositiveButton("Đăng xuất", (dialog, which) -> {
+                    logout();
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void logout() {
+        // Clear SharedPreferences
+        SharedPreferencesHelper prefs = new SharedPreferencesHelper(this);
+        prefs.clearAll();
+
+        // Navigate to LoginActivity
+        Intent intent = new Intent(AdminDashboardActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void navigateToActivity(Class<?> activityClass) {

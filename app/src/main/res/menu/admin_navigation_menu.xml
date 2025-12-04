@@ -22,44 +22,18 @@
             android:id="@+id/nav_manage_orders"
             android:icon="@android:drawable/ic_menu_recent_history"
             android:title="Quản lý hoá đơn" />
+
+        <item
+            android:id="@+id/nav_statistics"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="Xem thống kê" />
     </group>
 
-    <group android:id="@+id/group_one" android:checkableBehavior="none">
+    <group android:id="@+id/group_logout" android:checkableBehavior="none">
         <item
-            android:id="@+id/nav_page_one"
-            android:icon="@android:drawable/ic_menu_agenda"
-            android:title="Page One" />
-        <item
-            android:id="@+id/nav_page_two"
-            android:icon="@android:drawable/ic_menu_agenda"
-            android:title="Page Two" />
-        <item
-            android:id="@+id/nav_page_three"
-            android:icon="@android:drawable/ic_menu_agenda"
-            android:title="Page Three" />
-        <item
-            android:id="@+id/nav_page_four"
-            android:icon="@android:drawable/ic_menu_agenda"
-            android:title="Page Four" />
-    </group>
-
-    <group android:id="@+id/group_two" android:checkableBehavior="none">
-        <item
-            android:id="@+id/nav_page_five"
-            android:icon="@android:drawable/ic_menu_agenda"
-            android:title="Page Five" />
-        <item
-            android:id="@+id/nav_page_six"
-            android:icon="@android:drawable/ic_menu_agenda"
-            android:title="Page Six" />
-        <item
-            android:id="@+id/nav_page_seven"
-            android:icon="@android:drawable/ic_menu_agenda"
-            android:title="Page Seven" />
-        <item
-            android:id="@+id/nav_page_eight"
-            android:icon="@android:drawable/ic_menu_agenda"
-            android:title="Page Eight" />
+            android:id="@+id/nav_logout"
+            android:icon="@android:drawable/ic_menu_close_clear_cancel"
+            android:title="Đăng xuất" />
     </group>
 
 </menu>

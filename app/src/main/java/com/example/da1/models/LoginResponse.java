@@ -40,6 +40,7 @@ public class LoginResponse {
         private String name;
         private String phone;
         private String avatar;
+        private String role; // ADMIN hoặc CUSTOMER
 
         public UserData() {
         }
@@ -82,6 +83,18 @@ public class LoginResponse {
 
         public void setAvatar(String avatar) {
             this.avatar = avatar;
+        }
+
+        public String getRole() {
+            return role;
+        }
+
+        public void setRole(String role) {
+            this.role = role;
+        }
+
+        public boolean isAdmin() {
+            return "ADMIN".equalsIgnoreCase(role);
         }
     }
 }

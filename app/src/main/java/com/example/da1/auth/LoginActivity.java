@@ -45,9 +45,14 @@ public class LoginActivity extends AppCompatActivity {
         
         prefs = new SharedPreferencesHelper(this);
         
-        // Nếu đã đăng nhập, chuyển thẳng đến HomeActivity
+        // Nếu đã đăng nhập, kiểm tra role và chuyển đến màn hình phù hợp
         if (prefs.isLoggedIn()) {
-            navigateToHome();
+            String role = prefs.getUserRole();
+            if ("ADMIN".equalsIgnoreCase(role)) {
+                navigateToAdminDashboard();
+            } else {
+                navigateToHome();
+            }
             return;
         }
 
@@ -135,15 +140,35 @@ public class LoginActivity extends AppCompatActivity {
                             prefs.saveUserToken(token);
                             prefs.setLoggedIn(true);
                             
-                            if (loginResponse.getUser() != null) {
-                                prefs.saveUserId(loginResponse.getUser().getId());
+                            LoginResponse.UserData userData = loginResponse.getUser();
+                            if (userData != null) {
+                                prefs.saveUserId(userData.getId());
+                                
+                                // Lưu role vào SharedPreferences
+                                String role = userData.getRole();
+                                if (role != null) {
+                                    prefs.saveUserRole(role);
+                                }
+                                
+                                // Kiểm tra role và navigate đến màn hình phù hợp
+                                if (userData.isAdmin()) {
+                                    // Nếu là admin, chuyển đến AdminDashboardActivity
+                                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công với quyền quản lý!", Toast.LENGTH_SHORT).show();
+                                    navigateToAdminDashboard();
+                                } else {
+                                    // Nếu là user thường, chuyển đến HomeActivity
+                                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                                    navigateToHome();
+                                }
+                            } else {
+                                // Nếu không có user data, mặc định là user thường
+                                prefs.saveUserRole("CUSTOMER");
+                                Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                                navigateToHome();
                             }
                             
                             // Reset ApiClient để load lại với token mới
                             ApiClient.resetClient();
-                            
-                            Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                            navigateToHome();
                         } else {
                             Toast.makeText(LoginActivity.this, "Không nhận được token từ server", Toast.LENGTH_SHORT).show();
                         }
@@ -182,6 +207,12 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
+    private void navigateToAdminDashboard() {
+        Intent intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     private void showLoading(boolean show) {
         if (progressBar != null) {
             progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -189,4 +220,5 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setEnabled(!show);
     }
 }
+
 

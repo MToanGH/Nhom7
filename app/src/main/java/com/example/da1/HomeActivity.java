@@ -36,6 +36,7 @@ import com.example.da1.api.ProductListResponse;
 import com.example.da1.models.CategoryItem;
 import com.example.da1.models.ProductItem;
 import com.example.da1.utils.AuthHelper;
+import com.example.da1.utils.SharedPreferencesHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -108,13 +109,25 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
         
-        productAdapter.setEditListener(product -> {
-            showAddEditProductDialog(product);
-        });
+        // Chỉ cho phép edit/delete nếu user là ADMIN
+        SharedPreferencesHelper prefs = new SharedPreferencesHelper(this);
+        String userRole = prefs.getUserRole();
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(userRole);
         
-        productAdapter.setDeleteListener(product -> {
-            showDeleteConfirmDialog(product);
-        });
+        if (isAdmin) {
+            productAdapter.setEditListener(product -> {
+                showAddEditProductDialog(product);
+            });
+            
+            productAdapter.setDeleteListener(product -> {
+                showDeleteConfirmDialog(product);
+            });
+        }
+        
+        // Ẩn nút Add Product nếu không phải admin
+        if (btnAddProduct != null) {
+            btnAddProduct.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
+        }
         
         recyclerViewProducts.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerViewProducts.setAdapter(productAdapter);

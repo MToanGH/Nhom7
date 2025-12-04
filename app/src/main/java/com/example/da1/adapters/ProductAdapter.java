@@ -105,22 +105,27 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 }
             });
 
+            // Chỉ hiển thị nút edit/delete nếu có listener (tức là admin)
             if (btnEdit != null) {
-                btnEdit.setVisibility(View.VISIBLE);
-                btnEdit.setOnClickListener(v -> {
-                    if (editListener != null) {
+                if (editListener != null) {
+                    btnEdit.setVisibility(View.VISIBLE);
+                    btnEdit.setOnClickListener(v -> {
                         editListener.onProductEdit(product);
-                    }
-                });
+                    });
+                } else {
+                    btnEdit.setVisibility(View.GONE);
+                }
             }
 
             if (btnDelete != null) {
-                btnDelete.setVisibility(View.VISIBLE);
-                btnDelete.setOnClickListener(v -> {
-                    if (deleteListener != null) {
+                if (deleteListener != null) {
+                    btnDelete.setVisibility(View.VISIBLE);
+                    btnDelete.setOnClickListener(v -> {
                         deleteListener.onProductDelete(product);
-                    }
-                });
+                    });
+                } else {
+                    btnDelete.setVisibility(View.GONE);
+                }
             }
         }
     }

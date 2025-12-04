@@ -51,6 +51,7 @@ public class ProductItem {
     private java.util.List<String> sizes;
     private java.util.List<String> colors;
     private String description;
+    private int stock; // Số lượng tồn kho
 
     public ProductItem() {
     }
@@ -180,5 +181,14 @@ public class ProductItem {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
 }
+
 

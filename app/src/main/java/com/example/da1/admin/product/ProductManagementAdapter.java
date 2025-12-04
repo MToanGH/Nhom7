@@ -10,21 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.da1.R;
+import com.example.da1.models.ProductItem;
 
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
-    private List<Product> productList;
+public class ProductManagementAdapter extends RecyclerView.Adapter<ProductManagementAdapter.ProductViewHolder> {
+    private List<ProductItem> productList;
     private OnProductClickListener listener;
 
     public interface OnProductClickListener {
-        void onEditClick(Product product);
-        void onDeleteClick(Product product);
+        void onEditClick(ProductItem product);
+        void onDeleteClick(ProductItem product);
     }
 
-    public ProductAdapter(List<Product> productList, OnProductClickListener listener) {
+    public ProductManagementAdapter(List<ProductItem> productList, OnProductClickListener listener) {
         this.productList = productList;
         this.listener = listener;
     }
@@ -39,7 +40,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        Product product = productList.get(position);
+        ProductItem product = productList.get(position);
         holder.bind(product);
     }
 
@@ -68,29 +69,46 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             btnDelete = itemView.findViewById(R.id.btnDelete);
         }
 
-        public void bind(Product product) {
-            tvProductName.setText(product.getName());
-            
-            NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-            tvProductPrice.setText(currencyFormat.format(product.getPrice()));
-            
-            tvProductStock.setText("Tồn kho: " + product.getStock());
-            tvProductCategory.setText("Danh mục: " + product.getCategoryName());
-            tvProductStatus.setText(product.isActive() ? "Hoạt động" : "Không hoạt động");
+        public void bind(ProductItem product) {
+            if (tvProductName != null) {
+                tvProductName.setText(product.getName() + " - " + product.getCode());
+            }
 
-            btnEdit.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onEditClick(product);
-                }
-            });
+            if (tvProductPrice != null) {
+                NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+                tvProductPrice.setText(currencyFormat.format(product.getPrice()));
+            }
 
-            btnDelete.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onDeleteClick(product);
-                }
-            });
+            if (tvProductStock != null) {
+                tvProductStock.setText("Tồn kho: " + product.getStock());
+            }
+
+            if (tvProductCategory != null) {
+                String categoryName = product.getCategoryNameFromObject();
+                tvProductCategory.setText("Danh mục: " + (categoryName != null ? categoryName : "N/A"));
+            }
+
+            if (tvProductStatus != null) {
+                // ProductItem có thể không có trường isActive, tạm thời hiển thị "Hoạt động"
+                tvProductStatus.setText("Hoạt động");
+            }
+
+            if (btnEdit != null) {
+                btnEdit.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onEditClick(product);
+                    }
+                });
+            }
+
+            if (btnDelete != null) {
+                btnDelete.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onDeleteClick(product);
+                    }
+                });
+            }
         }
     }
 }
-
 
