@@ -84,7 +84,7 @@ public class HomeActivity extends AppCompatActivity {
         recyclerViewProducts = findViewById(R.id.recyclerViewProducts);
         bottomNavigation = findViewById(R.id.bottomNavigation);
         progressBar = findViewById(R.id.progressBar);
-        
+
         if (progressBar != null) {
             progressBar.setVisibility(View.GONE);
         }
@@ -108,27 +108,27 @@ public class HomeActivity extends AppCompatActivity {
             intent.putExtra("product_id", product.getId());
             startActivity(intent);
         });
-        
+
         // Chỉ cho phép edit/delete nếu user là ADMIN
         SharedPreferencesHelper prefs = new SharedPreferencesHelper(this);
         String userRole = prefs.getUserRole();
         boolean isAdmin = "ADMIN".equalsIgnoreCase(userRole);
-        
+
         if (isAdmin) {
             productAdapter.setEditListener(product -> {
                 showAddEditProductDialog(product);
             });
-            
+
             productAdapter.setDeleteListener(product -> {
                 showDeleteConfirmDialog(product);
             });
         }
-        
+
         // Ẩn nút Add Product nếu không phải admin
         if (btnAddProduct != null) {
             btnAddProduct.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
         }
-        
+
         recyclerViewProducts.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerViewProducts.setAdapter(productAdapter);
     }
@@ -137,15 +137,15 @@ public class HomeActivity extends AppCompatActivity {
         loadCategories();
         loadProducts();
     }
-    
+
     private void loadCategories() {
-        Call<ApiResponse<List<CategoryItem>>> call = 
-            ApiService.getCategoryApiService().getAllCategories();
-        
+        Call<ApiResponse<List<CategoryItem>>> call =
+                ApiService.getCategoryApiService().getAllCategories();
+
         call.enqueue(new Callback<ApiResponse<List<CategoryItem>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<CategoryItem>>> call, 
-                                 Response<ApiResponse<List<CategoryItem>>> response) {
+            public void onResponse(Call<ApiResponse<List<CategoryItem>>> call,
+                                   Response<ApiResponse<List<CategoryItem>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<List<CategoryItem>> apiResponse = response.body();
                     if (apiResponse.isSuccess() && apiResponse.getData() != null) {
@@ -165,7 +165,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
-    
+
     private void loadSampleCategories() {
         categoryList.clear();
         categoryList.add(new CategoryItem("1", "Áo Polo", ""));
@@ -174,24 +174,24 @@ public class HomeActivity extends AppCompatActivity {
         categoryList.add(new CategoryItem("4", "Quần Short", ""));
         categoryAdapter.notifyDataSetChanged();
     }
-    
+
     private void loadProducts() {
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
         }
-        
+
         Call<ApiResponse<ProductListResponse>> call = ApiService.getProductApiService().getAllProducts(
-            null, null, 1, 20
+                null, null, 1, 20
         );
-        
+
         call.enqueue(new Callback<ApiResponse<ProductListResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<ProductListResponse>> call, 
-                                 Response<ApiResponse<ProductListResponse>> response) {
+            public void onResponse(Call<ApiResponse<ProductListResponse>> call,
+                                   Response<ApiResponse<ProductListResponse>> response) {
                 if (progressBar != null) {
                     progressBar.setVisibility(View.GONE);
                 }
-                
+
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<ProductListResponse> apiResponse = response.body();
                     if (apiResponse.isSuccess() && apiResponse.getData() != null) {
@@ -223,36 +223,36 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
-    
+
     private void loadSampleProducts() {
         // Sample data chỉ để test UI, không dùng để navigate
         productList.clear();
         productAdapter.notifyDataSetChanged();
         Toast.makeText(this, "Không có sản phẩm. Vui lòng tạo sản phẩm trong database.", Toast.LENGTH_LONG).show();
     }
-    
+
     private void searchProducts(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             loadProducts();
             return;
         }
-        
+
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
         }
-        
+
         Call<ApiResponse<ProductListResponse>> call = ApiService.getSearchApiService().searchProducts(
-            keyword.trim(), 1, 20
+                keyword.trim(), 1, 20
         );
-        
+
         call.enqueue(new Callback<ApiResponse<ProductListResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<ProductListResponse>> call, 
-                                 Response<ApiResponse<ProductListResponse>> response) {
+            public void onResponse(Call<ApiResponse<ProductListResponse>> call,
+                                   Response<ApiResponse<ProductListResponse>> response) {
                 if (progressBar != null) {
                     progressBar.setVisibility(View.GONE);
                 }
-                
+
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<ProductListResponse> apiResponse = response.body();
                     if (apiResponse.isSuccess() && apiResponse.getData() != null) {
@@ -262,7 +262,7 @@ public class HomeActivity extends AppCompatActivity {
                             productList.addAll(data.getProducts());
                             productAdapter.notifyDataSetChanged();
                             Log.d("HomeActivity", "Search results: " + productList.size() + " products for keyword: " + keyword);
-                            
+
                             if (productList.isEmpty()) {
                                 Toast.makeText(HomeActivity.this, "Không tìm thấy sản phẩm nào", Toast.LENGTH_SHORT).show();
                             }
@@ -272,9 +272,9 @@ public class HomeActivity extends AppCompatActivity {
                             Toast.makeText(HomeActivity.this, "Không tìm thấy sản phẩm nào", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        String errorMsg = apiResponse.getMessage() != null 
-                            ? apiResponse.getMessage() 
-                            : "Lỗi tìm kiếm";
+                        String errorMsg = apiResponse.getMessage() != null
+                                ? apiResponse.getMessage()
+                                : "Lỗi tìm kiếm";
                         Toast.makeText(HomeActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
                     }
                 } else {
@@ -315,13 +315,13 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 String keyword = s.toString().trim();
-                
+
                 // Nếu rỗng, load lại tất cả sản phẩm
                 if (keyword.isEmpty()) {
                     loadProducts();
                     return;
                 }
-                
+
                 // Delay 500ms trước khi tìm kiếm để tránh gọi API quá nhiều
                 runnable = () -> searchProducts(keyword);
                 handler.postDelayed(runnable, 500);
@@ -373,7 +373,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void showAddEditProductDialog(ProductItem product) {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_edit_product, null);
-        
+
         EditText etProductName = dialogView.findViewById(R.id.etProductName);
         EditText etProductCode = dialogView.findViewById(R.id.etProductCode);
         EditText etProductPrice = dialogView.findViewById(R.id.etProductPrice);
@@ -401,8 +401,8 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-            .setView(dialogView)
-            .create();
+                .setView(dialogView)
+                .create();
 
         btnPreviewImage.setOnClickListener(v -> {
             String url = etImageUrl.getText().toString().trim();
@@ -425,7 +425,7 @@ public class HomeActivity extends AppCompatActivity {
 
             try {
                 double price = Double.parseDouble(priceStr);
-                
+
                 if (isEdit) {
                     // Update existing product via API
                     updateProductViaAPI(product.getId(), name, code, price, imageUrl, dialog);
@@ -449,59 +449,59 @@ public class HomeActivity extends AppCompatActivity {
 
     private void showDeleteConfirmDialog(ProductItem product) {
         new MaterialAlertDialogBuilder(this)
-            .setTitle("Xóa sản phẩm")
-            .setMessage("Bạn có chắc chắn muốn xóa sản phẩm " + product.getName() + "?")
-            .setPositiveButton("Xóa", (dialog, which) -> {
-                int position = productList.indexOf(product);
-                if (position != -1) {
-                    productList.remove(position);
-                    productAdapter.notifyItemRemoved(position);
-                    Toast.makeText(this, "Đã xóa sản phẩm", Toast.LENGTH_SHORT).show();
-                }
-            })
-            .setNegativeButton("Hủy", null)
-            .show();
+                .setTitle("Xóa sản phẩm")
+                .setMessage("Bạn có chắc chắn muốn xóa sản phẩm " + product.getName() + "?")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    int position = productList.indexOf(product);
+                    if (position != -1) {
+                        productList.remove(position);
+                        productAdapter.notifyItemRemoved(position);
+                        Toast.makeText(this, "Đã xóa sản phẩm", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
     private void showAccountDialog() {
         new MaterialAlertDialogBuilder(this)
-            .setTitle("Tài khoản")
-            .setItems(new String[]{"Thông tin tài khoản", "Đăng xuất"}, (dialog, which) -> {
-                if (which == 0) {
-                    // Thông tin tài khoản
-                    Intent intent = new Intent(HomeActivity.this, AccountActivity.class);
-                    startActivity(intent);
-                } else if (which == 1) {
-                    // Đăng xuất
-                    showLogoutConfirmDialog();
-                }
-            })
-            .show();
+                .setTitle("Tài khoản")
+                .setItems(new String[]{"Thông tin tài khoản", "Đăng xuất"}, (dialog, which) -> {
+                    if (which == 0) {
+                        // Thông tin tài khoản
+                        Intent intent = new Intent(HomeActivity.this, AccountActivity.class);
+                        startActivity(intent);
+                    } else if (which == 1) {
+                        // Đăng xuất
+                        showLogoutConfirmDialog();
+                    }
+                })
+                .show();
     }
 
     private void showLogoutConfirmDialog() {
         new MaterialAlertDialogBuilder(this)
-            .setTitle("Đăng xuất")
-            .setMessage("Bạn có chắc chắn muốn đăng xuất?")
-            .setPositiveButton("Đăng xuất", (dialog, which) -> {
-                AuthHelper.logoutAndNavigateToLogin(this);
-            })
-            .setNegativeButton("Hủy", null)
-            .show();
+                .setTitle("Đăng xuất")
+                .setMessage("Bạn có chắc chắn muốn đăng xuất?")
+                .setPositiveButton("Đăng xuất", (dialog, which) -> {
+                    AuthHelper.logoutAndNavigateToLogin(this);
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
-    
+
     private void createProductViaAPI(String name, String code, double price, String imageUrl, AlertDialog dialog) {
         // Tạo sản phẩm qua API
         // Lưu ý: API yêu cầu categoryid hợp lệ
         // Tạm thời dùng category đầu tiên hoặc yêu cầu user chọn
-        
+
         if (categoryList.isEmpty()) {
             Toast.makeText(this, "Vui lòng tạo danh mục trước", Toast.LENGTH_SHORT).show();
             return;
         }
-        
+
         String categoryId = categoryList.get(0).getId();
-        
+
         // Tạo ProductItem để gửi lên API
         ProductItem newProduct = new ProductItem();
         newProduct.setName(name);
@@ -514,18 +514,18 @@ public class HomeActivity extends AppCompatActivity {
             newProduct.setImage(imageList);
         }
         newProduct.setCategoryId(categoryId); // Sẽ set vào categoryid với @SerializedName("categoryid")
-        
+
         // Log để debug
         Log.d("HomeActivity", "Creating product - Name: " + name + ", CategoryId: " + categoryId + ", Price: " + price);
         Log.d("HomeActivity", "ProductItem categoryId: " + newProduct.getCategoryId());
-        
+
         // Gọi API để tạo sản phẩm
         Call<ApiResponse<ProductItem>> call = ApiService.getProductApiService().createProduct(newProduct);
-        
+
         call.enqueue(new Callback<ApiResponse<ProductItem>>() {
             @Override
-            public void onResponse(Call<ApiResponse<ProductItem>> call, 
-                                 Response<ApiResponse<ProductItem>> response) {
+            public void onResponse(Call<ApiResponse<ProductItem>> call,
+                                   Response<ApiResponse<ProductItem>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<ProductItem> apiResponse = response.body();
                     if (apiResponse.isSuccess() && apiResponse.getData() != null) {
@@ -535,9 +535,9 @@ public class HomeActivity extends AppCompatActivity {
                         Toast.makeText(HomeActivity.this, "Đã thêm sản phẩm", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     } else {
-                        String errorMsg = apiResponse.getMessage() != null 
-                            ? apiResponse.getMessage() 
-                            : "Lỗi tạo sản phẩm";
+                        String errorMsg = apiResponse.getMessage() != null
+                                ? apiResponse.getMessage()
+                                : "Lỗi tạo sản phẩm";
                         Toast.makeText(HomeActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
                     }
                 } else {
@@ -551,7 +551,7 @@ public class HomeActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         Log.e("HomeActivity", "Error reading error body", e);
                     }
-                    
+
                     String errorMsg = "Lỗi tạo sản phẩm (Code: " + response.code() + ")";
                     if (response.code() == 400) {
                         errorMsg = "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin sản phẩm.";
@@ -573,17 +573,17 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
-    
+
     private void updateProductViaAPI(String productId, String name, String code, double price, String imageUrl, AlertDialog dialog) {
         // Cập nhật sản phẩm qua API
-        
+
         if (categoryList.isEmpty()) {
             Toast.makeText(this, "Vui lòng tạo danh mục trước", Toast.LENGTH_SHORT).show();
             return;
         }
-        
+
         String categoryId = categoryList.get(0).getId();
-        
+
         // Tạo ProductItem để gửi lên API
         ProductItem updatedProduct = new ProductItem();
         updatedProduct.setName(name);
@@ -596,27 +596,27 @@ public class HomeActivity extends AppCompatActivity {
             updatedProduct.setImage(imageList);
         }
         updatedProduct.setCategoryId(categoryId);
-        
+
         // Gọi API để cập nhật sản phẩm
         Call<ApiResponse<ProductItem>> call = ApiService.getProductApiService().updateProduct(productId, updatedProduct);
-        
+
         call.enqueue(new Callback<ApiResponse<ProductItem>>() {
             @Override
-            public void onResponse(Call<ApiResponse<ProductItem>> call, 
-                                 Response<ApiResponse<ProductItem>> response) {
+            public void onResponse(Call<ApiResponse<ProductItem>> call,
+                                   Response<ApiResponse<ProductItem>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<ProductItem> apiResponse = response.body();
                     if (apiResponse.isSuccess() && apiResponse.getData() != null) {
                         // Reload danh sách sản phẩm từ API để đảm bảo đồng bộ
                         // Điều này đảm bảo dữ liệu ở trang chủ và chi tiết giống nhau
                         loadProducts();
-                        
+
                         Toast.makeText(HomeActivity.this, "Đã cập nhật sản phẩm", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     } else {
-                        String errorMsg = apiResponse.getMessage() != null 
-                            ? apiResponse.getMessage() 
-                            : "Lỗi cập nhật sản phẩm";
+                        String errorMsg = apiResponse.getMessage() != null
+                                ? apiResponse.getMessage()
+                                : "Lỗi cập nhật sản phẩm";
                         Toast.makeText(HomeActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
                     }
                 } else {
